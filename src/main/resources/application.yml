@@ -1,2 +1,12 @@
 server:
   port: 8081
+
+spring:
+  elasticsearch:
+    username: elastic
+    password: -QGUH_jTWxOtdcHM*9DP
+    uris: 47.94.163.139:9200
+
+logging:
+  level:
+    root: info
