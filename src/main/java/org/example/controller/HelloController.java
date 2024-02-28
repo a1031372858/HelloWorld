@@ -49,6 +49,6 @@ public class HelloController {
         HashMap<String, String> param = new HashMap<>();
         param.put("phone","15797704512");
         String json = JSON.toJSONString(param);
-        return okHttpUtil.post("http://localhost:8082/api/user/read/findByPhone",json);
+        return okHttpUtil.postJson("http://localhost:8082/api/user/read/findByPhone",json);
     }
 }
