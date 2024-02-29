@@ -13,4 +13,8 @@ import java.util.Date;
 public interface UserService {
 
      UserTO userInfo();
+
+    String responseRetrofitPost();
+
+    String responseRetrofitGet();
 }
