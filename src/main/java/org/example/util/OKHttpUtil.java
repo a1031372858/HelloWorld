@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -15,13 +14,23 @@ import java.util.concurrent.TimeUnit;
  * @author xuyachang
  * @date 2024/2/26
  */
-@RequiredArgsConstructor
-@Component
 public class OKHttpUtil {
 
-    private final OkHttpClient client;
+    private static final OkHttpClient client = new OkHttpClient().newBuilder()
+            .retryOnConnectionFailure(false)
+            .connectionPool(new ConnectionPool(200, 5, TimeUnit.MINUTES))
+            .connectTimeout(30,TimeUnit.SECONDS)
+            .readTimeout(30,TimeUnit.SECONDS)
+            .writeTimeout(30,TimeUnit.SECONDS)
+            .build();
 
-    public String get(String url,Map<String,String> param){
+    private OKHttpUtil(){}
+
+    public static OkHttpClient getClient(){
+        return client;
+    }
+
+    public static String get(String url,Map<String,String> param){
 
         HttpUrl builderUrl = HttpUrl.parse(url);
         if(Objects.isNull(builderUrl)){
@@ -42,7 +51,7 @@ public class OKHttpUtil {
         return executeRequest(request);
     }
 
-    public String postJson(String url,String json){
+    public static String postJson(String url,String json){
         RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),json);
 
         Request request = new Request.Builder()
@@ -53,7 +62,7 @@ public class OKHttpUtil {
         return executeRequest(request);
     }
 
-    public String postFrom(String url,Map<String,String> param){
+    public static String postFrom(String url,Map<String,String> param){
         FormBody.Builder formBuilder = new FormBody.Builder();
         param.forEach(formBuilder::add);
         RequestBody formBody = formBuilder.build();
@@ -66,7 +75,7 @@ public class OKHttpUtil {
         return executeRequest(request);
     }
 
-    public String postFile(String url,String fileUrl){
+    public static String postFile(String url,String fileUrl){
         File file = new File(fileUrl);
         Request request = new Request.Builder()
                 .url(url)
@@ -76,7 +85,7 @@ public class OKHttpUtil {
         return executeRequest(request);
     }
 
-    private String executeRequest(Request request){
+    private static String executeRequest(Request request){
         //执行请求
         try (Response response = client.newCall(request).execute()){
             //返回响应
@@ -87,7 +96,7 @@ public class OKHttpUtil {
         }
     }
 
-    private String handleResponse(Response response) throws IOException {
+    private static String handleResponse(Response response) throws IOException {
         if(response.isSuccessful() && 200 == response.code()){
             return response.body().string();
         }else{
@@ -95,7 +104,7 @@ public class OKHttpUtil {
         }
     }
 
-    public void getDemo(){
+    public static void getDemo(){
         //创建okhttp客户端
         //在实际项目中，应该复用OkHttpClient，做成配置类交给spring容器管理
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
@@ -157,7 +166,7 @@ public class OKHttpUtil {
     }
 
 
-    public void postDemo(){
+    public static void postDemo(){
 
         //创建okhttp客户端
         //在实际项目中，应该复用OkHttpClient，做成配置类交给spring容器管理

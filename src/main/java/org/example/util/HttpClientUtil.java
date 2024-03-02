@@ -30,30 +30,32 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpClientUtil {
 
-    private CloseableHttpClient client;
+    private static final CloseableHttpClient client;
 
-    private PoolingHttpClientConnectionManager clientConnectionManager;
+    static {
+        HttpClientBuilder clientBuilder = HttpClients.custom();
+        PoolingHttpClientConnectionManager clientConnectionManager = new PoolingHttpClientConnectionManager();
+        clientConnectionManager.setMaxTotal(50);
+        clientConnectionManager.setDefaultMaxPerRoute(50);
 
-    public CloseableHttpClient getClient(){
-        if(client == null){
-            HttpClientBuilder clientBuilder = HttpClients.custom();
-            clientConnectionManager = new PoolingHttpClientConnectionManager();
-            clientConnectionManager.setMaxTotal(50);
-            clientConnectionManager.setDefaultMaxPerRoute(50);
+        clientBuilder.setConnectionManager(clientConnectionManager);
 
-            clientBuilder.setConnectionManager(clientConnectionManager);
+        RequestConfig config = RequestConfig.custom()
+                .setConnectionRequestTimeout(30, TimeUnit.SECONDS)
+                .setResponseTimeout(30,TimeUnit.SECONDS)
+                .build();
+        clientBuilder.setDefaultRequestConfig(config);
+        client = clientBuilder.build();
+    }
 
-            RequestConfig config = RequestConfig.custom()
-                    .setConnectionRequestTimeout(30, TimeUnit.SECONDS)
-                    .setResponseTimeout(30,TimeUnit.SECONDS)
-                    .build();
-            clientBuilder.setDefaultRequestConfig(config);
-            client = clientBuilder.build();
-        }
+    private HttpClientUtil(){}
+
+
+    public static CloseableHttpClient getClient(){
         return client;
     }
 
-    public String get(){
+    public static String get(){
         CloseableHttpResponse response = null;
         HttpGet httpGet = new HttpGet("http://localhost:8082/api/user/read/getByPhone");
         try {
@@ -77,7 +79,7 @@ public class HttpClientUtil {
         }
 
     }
-    public void postFrom(){
+    public static void postFrom(){
         try {
             // 创建httppost
             HttpPost httpPost = new HttpPost("http://localhost:8080/xxxxxx");
@@ -112,7 +114,7 @@ public class HttpClientUtil {
         }
     }
 
-    public void postJson(){
+    public static void postJson(){
         try {
             // 创建httppost
             HttpPost httpPost = new HttpPost("http://localhost:8082/api/user/read/getByPhone");
