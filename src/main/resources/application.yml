@@ -1,0 +1,21 @@
+server:
+  port: 8081
+elasticjob:
+  regCenter:
+    serverLists: 47.116.216.209:2181
+    namespace: hello-world-elasticjob
+    # 等待重试的间隔时间的初始值   单位：毫秒
+    base-sleep-time-milliseconds: 10000
+    # 等待重试的间隔时间的最大值
+    max-sleep-time-milliseconds: 30000
+    # 最大重试次数
+    max-retries: 3
+    # 会话超时时间 单位: 毫秒
+    session-timeout-milliseconds: 600000
+    # 连接超时时间 单位: 毫秒
+    connection-timeout-milliseconds: 600000
+  jobs:
+    HelloWorldJob:
+      elasticJobClass: org.example.job.HelloWorldJob
+      cron: 0/5 * * * * ?
+      shardingTotalCount: 1
