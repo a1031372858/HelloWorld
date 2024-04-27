@@ -1,2 +1,13 @@
 server:
   port: 8081
+xxl:
+  job:
+    executor:
+      appname: hello-executor
+      address:
+      ip:
+      port: 9999
+      logretentiondays: 30
+    accessToken: default_token
+    admin:
+      addresses: http://127.0.0.1:8080/xxl-job-admin
