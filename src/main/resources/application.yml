@@ -1,2 +1,9 @@
 server:
   port: 8081
+spring:
+  application:
+    name: hello-world
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 47.116.216.209:8848
