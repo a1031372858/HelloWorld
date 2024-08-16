@@ -1,2 +1,15 @@
 server:
   port: 8081
+spring:
+  application:
+    name: hello-world
+  redis:
+    port: 6379
+    password: xyc20240303
+    host: 47.116.216.209
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+      shutdown-timeout: 100
