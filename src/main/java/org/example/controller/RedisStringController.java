@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author xuyachang
@@ -202,4 +203,26 @@ public class RedisStringController {
         return increment.toString();
     }
 
+    /**
+     * 获取锁
+     * @param key
+     * @param timeout
+     * @return
+     */
+    @GetMapping("/getLock/{key}")
+    public String getLock(@PathVariable String key,Integer timeout){
+        Boolean result = redisTemplate.opsForValue().setIfAbsent(key, "1", timeout, TimeUnit.SECONDS);
+        return Boolean.TRUE.equals(result)?result.toString():"false";
+    }
+
+    /**
+     * 释放锁
+     * @param key
+     * @return
+     */
+    @GetMapping("/unlock/{key}")
+    public String unlock(@PathVariable String key){
+        Boolean result = redisTemplate.delete(key);
+        return Boolean.TRUE.equals(result) ? result.toString() : "false";
+    }
 }
