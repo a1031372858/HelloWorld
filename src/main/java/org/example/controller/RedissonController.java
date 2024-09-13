@@ -1,9 +1,11 @@
 package org.example.controller;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.model.to.UserTO;
+import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -197,4 +199,32 @@ public class RedissonController {
         lock.lock(30, TimeUnit.SECONDS);
         return "锁成功";
     }
+
+    /**
+     * 布隆过滤器增加数据
+     * @param value
+     * @return
+     */
+    @GetMapping("/bl/add/{value}")
+    public String blSet(@PathVariable String value){
+        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter("TEST:BLOOM:1");
+        if(!bloomFilter.isExists()){
+            bloomFilter.tryInit(100000,0.001);
+        }
+        boolean addResult = bloomFilter.add(value);
+        return String.valueOf(addResult);
+    }
+
+    /**
+     * 布隆过滤器校验数据
+     * @param value
+     * @return
+     */
+    @GetMapping("/bl/contains/{value}")
+    public String blContains(@PathVariable String value){
+        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter("TEST:BLOOM:1");
+        boolean containsResult = bloomFilter.contains(value);
+        return String.valueOf(containsResult);
+    }
+
 }
