@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
 
 
 /**
@@ -29,6 +31,8 @@ import java.util.Date;
 public class ElasticSearchController {
 
     private final ElasticsearchClient elasticsearchClient;
+
+    private final ElasticsearchAsyncClient elasticsearchAsyncClient;
 
     @GetMapping("get/{indexName}")
     public String getIndex(@PathVariable String indexName) {
@@ -131,6 +135,30 @@ public class ElasticSearchController {
             return searchResponse.toString();
         } catch (IOException e) {
             return "查询失败";
+        }
+    }
+
+    @GetMapping("document/async/create/{indexName}/{id}")
+    public String createDocumentAsync(@PathVariable String indexName,@PathVariable String id){
+        UserTO user = new UserTO();
+        user.setId(1L);
+        user.setName("张三");
+        user.setMobile(id);
+        user.setBirthday(new Date());
+
+        try {
+//            CreateRequest<Object> createRequest = new CreateRequest.Builder<>()
+//                    .index(indexName)
+//                    .id(id)
+//                    .document(user)
+//                    .build();
+            CompletableFuture<CreateResponse> createResponseCompletableFuture = elasticsearchAsyncClient.create(i -> i.index(indexName).id(id).document(user));
+            createResponseCompletableFuture.whenComplete((response,e)->{
+                log.info("创建文档响应结果:"+response.toString());
+            });
+            return "创建成功";
+        } catch (Exception e) {
+            return "创建失败";
         }
     }
 }
