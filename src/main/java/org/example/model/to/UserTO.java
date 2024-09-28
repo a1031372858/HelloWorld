@@ -1,5 +1,6 @@
 package org.example.model.to;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,5 +17,6 @@ public class UserTO implements Serializable {
 
     private String mobile;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date birthday;
 }

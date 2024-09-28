@@ -1,5 +1,6 @@
 package org.example.config;
 
+import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -49,6 +50,25 @@ public class ElasticSearchConfig {
         ElasticsearchTransport transport = new RestClientTransport(restClient,new JacksonJsonpMapper());
         // And create the API client
         return new ElasticsearchClient(transport);
+    }
+
+    @Bean
+    public ElasticsearchAsyncClient elasticsearchAsyncClient(){
+
+        HttpHost[] httpHosts = toHttpHost();
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+
+        RestClientBuilder builder = RestClient.builder(httpHosts);
+        builder.setRequestConfigCallback(
+                requestConfigBuilder -> requestConfigBuilder.setSocketTimeout(60000).setConnectTimeout(5000));
+        builder.setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+        RestClient restClient = builder.build();
+        // Create the transport with a Jackson mapper
+        ElasticsearchTransport transport = new RestClientTransport(restClient,new JacksonJsonpMapper());
+        // And create the API client
+        return new ElasticsearchAsyncClient(transport);
     }
 
     private HttpHost[] toHttpHost() {
